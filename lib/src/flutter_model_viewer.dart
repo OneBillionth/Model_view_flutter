@@ -2,7 +2,8 @@
 
 import 'dart:async' show Completer, unawaited;
 import 'dart:convert' show utf8;
-import 'dart:io' show File, HttpRequest, HttpServer, HttpStatus, InternetAddress, Platform;
+import 'dart:io'
+    show File, HttpRequest, HttpServer, HttpStatus, InternetAddress, Platform;
 import 'dart:typed_data' show Uint8List;
 
 import 'package:android_intent_plus/flag.dart';
@@ -16,6 +17,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'html_builder.dart';
 
 /// Flutter widget for rendering interactive 3D models.
+
+enum TouchAction { panY, panX, none }
 
 class ModelViewer extends StatefulWidget {
   const ModelViewer(
@@ -34,7 +37,29 @@ class ModelViewer extends StatefulWidget {
       this.onError,
       this.loadingView,
       this.rotationPerSecond,
-      this.openCache})
+      this.openCache,
+      this.xrEnvironment,
+      this.enablePan,
+      this.disableZoom,
+      this.orbitSensitivity,
+      this.touchAction,
+      this.cameraOrbit,
+      this.cameraTarget,
+      this.fieldOfView,
+      this.maxCameraOrbit,
+      this.minCameraOrbit,
+      this.maxFieldOfView,
+      this.minFieldOfView,
+      this.skyboxImage,
+      this.environmentImage,
+      this.exposure,
+      this.shadowIntensity,
+      this.shadowSoftness,
+      this.animationName,
+      this.animationCrossfadeDuration,
+      this.variantName,
+      this.orientation,
+      this.scale})
       : super(key: key);
 
   /// The background color for the model viewer.
@@ -102,12 +127,36 @@ class ModelViewer extends StatefulWidget {
   //WebView加载失败回调
   final VoidCallback? onError;
 
+  final bool? xrEnvironment;
+  final bool? enablePan;
+  final bool? disableZoom;
+  final int? orbitSensitivity;
+  final TouchAction? touchAction;
+  final String? cameraOrbit;
+  final String? cameraTarget;
+  final String? fieldOfView;
+  final String? maxCameraOrbit;
+  final String? minCameraOrbit;
+  final String? maxFieldOfView;
+  final String? minFieldOfView;
+  final String? skyboxImage;
+  final String? environmentImage;
+  final num? exposure;
+  final num? shadowIntensity;
+  final num? shadowSoftness;
+  final String? animationName;
+  final num? animationCrossfadeDuration;
+  final String? variantName;
+  final String? orientation;
+  final String? scale;
+
   @override
   State<ModelViewer> createState() => _ModelViewerState();
 }
 
 class _ModelViewerState extends State<ModelViewer> {
-  final Completer<WebViewController> _controller = Completer<WebViewController>();
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
 
   HttpServer? _proxy;
   bool loaded = false;
@@ -170,7 +219,9 @@ class _ModelViewerState extends State<ModelViewer> {
                   'mode': 'ar_only',
                 },
                 package: "com.google.ar.core",
-                flags: <int>[Flag.FLAG_ACTIVITY_NEW_TASK], // Intent.FLAG_ACTIVITY_NEW_TASK,
+                flags: <int>[
+                  Flag.FLAG_ACTIVITY_NEW_TASK
+                ], // Intent.FLAG_ACTIVITY_NEW_TASK,
               );
               await intent.launch();
             } catch (error) {
@@ -183,7 +234,9 @@ class _ModelViewerState extends State<ModelViewer> {
           onPageStarted: (final String url) {
             // print('>>>> ModelViewer began loading: <$url>'); // DEBUG
           },
-          javascriptChannels: <JavascriptChannel>{getModelVisibilityJavascriptChannel()},
+          javascriptChannels: <JavascriptChannel>{
+            getModelVisibilityJavascriptChannel()
+          },
           onPageFinished: (final String url) async {
             // print('>>>> ModelViewer finished loading: <$url>'); // DEBUG
           },
@@ -220,19 +273,46 @@ class _ModelViewerState extends State<ModelViewer> {
 
   String _buildHTML(final String htmlTemplate) {
     return HTMLBuilder.build(
-        htmlTemplate: htmlTemplate,
-        backgroundColor: widget.backgroundColor,
-        src: '/model',
-        alt: widget.alt,
-        rotationPerSecond: widget.rotationPerSecond,
-        ar: widget.ar,
-        arModes: widget.arModes,
-        arScale: widget.arScale,
-        autoRotate: widget.autoRotate,
-        autoRotateDelay: widget.autoRotateDelay,
-        autoPlay: widget.autoPlay,
-        cameraControls: widget.cameraControls,
-        iosSrc: widget.iosSrc);
+      htmlTemplate: htmlTemplate,
+      backgroundColor: widget.backgroundColor,
+      src: '/model',
+      alt: widget.alt,
+      rotationPerSecond: widget.rotationPerSecond,
+      ar: widget.ar,
+      arModes: widget.arModes,
+      arScale: widget.arScale,
+      autoRotate: widget.autoRotate,
+      autoRotateDelay: widget.autoRotateDelay,
+      autoPlay: widget.autoPlay,
+      cameraControls: widget.cameraControls,
+      iosSrc: widget.iosSrc,
+      xrEnvironment: widget.xrEnvironment,
+      // Staing & Cameras Attributes
+      enablePan: widget.enablePan,
+      touchAction: widget.touchAction,
+      disableZoom: widget.disableZoom,
+      orbitSensitivity: widget.orbitSensitivity,
+      cameraOrbit: widget.cameraOrbit,
+      cameraTarget: widget.cameraTarget,
+      fieldOfView: widget.fieldOfView,
+      maxCameraOrbit: widget.maxCameraOrbit,
+      minCameraOrbit: widget.minCameraOrbit,
+      maxFieldOfView: widget.maxFieldOfView,
+      minFieldOfView: widget.minFieldOfView,
+      // Lighting & Env Attributes
+      skyboxImage: widget.skyboxImage,
+      environmentImage: widget.environmentImage,
+      exposure: widget.exposure,
+      shadowIntensity: widget.shadowIntensity,
+      shadowSoftness: widget.shadowSoftness,
+      // Animation Attributes
+      animationName: widget.animationName,
+      animationCrossfadeDuration: widget.animationCrossfadeDuration,
+      // Scene Graph Attributes
+      variantName: widget.variantName,
+      orientation: widget.orientation,
+      scale: widget.scale,
+    );
   }
 
   Future<void> _initProxy() async {
@@ -245,7 +325,8 @@ class _ModelViewerState extends State<ModelViewer> {
       switch (request.uri.path) {
         case '/':
         case '/index.html':
-          final htmlTemplate = await rootBundle.loadString('packages/flutter_model_viewer/etc/assets/template.html');
+          final htmlTemplate = await rootBundle.loadString(
+              'packages/flutter_model_viewer/etc/assets/template.html');
           final html = utf8.encode(_buildHTML(htmlTemplate));
           response
             ..statusCode = HttpStatus.ok
@@ -256,10 +337,12 @@ class _ModelViewerState extends State<ModelViewer> {
           break;
 
         case '/model-viewer.js':
-          final code = await _readAsset('packages/flutter_model_viewer/etc/assets/model-viewer.js');
+          final code = await _readAsset(
+              'packages/flutter_model_viewer/etc/assets/model-viewer.js');
           response
             ..statusCode = HttpStatus.ok
-            ..headers.add("Content-Type", "application/javascript;charset=UTF-8")
+            ..headers
+                .add("Content-Type", "application/javascript;charset=UTF-8")
             ..headers.add("Content-Length", code.lengthInBytes.toString())
             ..add(code);
           await response.close();
@@ -274,7 +357,9 @@ class _ModelViewerState extends State<ModelViewer> {
           if (url.isAbsolute && !url.isScheme("file")) {
             await response.redirect(url); // TODO: proxy the resource
           } else {
-            final data = await (url.isScheme("file") ? _readFile(url.path) : _readAsset(url.path));
+            final data = await (url.isScheme("file")
+                ? _readFile(url.path)
+                : _readAsset(url.path));
             response
               ..statusCode = HttpStatus.ok
               ..headers.add("Content-Type", "application/octet-stream")
