@@ -70,7 +70,7 @@ abstract class HTMLBuilder {
     //添加3D资源
     html.write(' src="${htmlEscape.convert(src)}"');
     //关闭演示模式
-    html.write(' interaction-prompt="auto"');
+    html.write(' interaction-prompt="none"');
     //设置触摸滑动方向 xy轴均可
     // html.write(' touch-action="pan-x pan-y"');
     html.write(
