@@ -63,18 +63,18 @@ abstract class HTMLBuilder {
         '<style scoped>*{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;}</style>');
     html.write('<model-viewer id="toggle-model"');
     //去除海报闪烁
-    html.write(' seamless-poster');
-    html.write(' bounds="tight"');
+    // html.write(' seamless-poster');
+    // html.write(' bounds="tight"');
 
     html.write(' environment-image="neutral"');
     //添加3D资源
     html.write(' src="${htmlEscape.convert(src)}"');
     //关闭演示模式
-    html.write(' interaction-prompt="none"');
+    // html.write(' interaction-prompt="none"');
     //设置触摸滑动方向 xy轴均可
-    // html.write(' touch-action="pan-x pan-y"');
+    html.write(' touch-action="pan-x pan-y"');
     html.write(
-        ' style="background-color: rgb(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue});"');
+        'background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${backgroundColor.alpha}); ');
 
     if (alt != null) {
       html.write(' alt="${htmlEscape.convert(alt)}"');
@@ -232,9 +232,9 @@ abstract class HTMLBuilder {
       html.write(' ios-src="${htmlEscape.convert(iosSrc)}"');
     }
     html.writeln('>');
-    // html.writeln('<div  slot="poster"></div>');
+    html.writeln('<div  slot="poster"></div>');
     html.writeln('<div slot="progress-bar"></div slot="">');
-    html.writeln('<div slot="interaction-prompt"></div>');
+    // html.writeln('<div slot="interaction-prompt"></div>');
     html.writeln('</model-viewer>');
 
     //当模型可见时通知外部
