@@ -73,6 +73,8 @@ abstract class HTMLBuilder {
     // html.write(' interaction-prompt="none"');
     //设置触摸滑动方向 xy轴均可
     html.write(' touch-action="pan-x pan-y"');
+
+    html.write(' style="');
     html.write(
         'background-color: rgba(${backgroundColor.red}, ${backgroundColor.green}, ${backgroundColor.blue}, ${backgroundColor.alpha}); ');
 
