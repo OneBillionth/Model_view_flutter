@@ -23,7 +23,7 @@ enum TouchAction { panY, panX, none }
 class ModelViewer extends StatefulWidget {
   const ModelViewer(
       {Key? key,
-      this.backgroundColor = Colors.white,
+      this.backgroundColor = Colors.transparent,
       required this.src,
       this.alt,
       this.ar,
